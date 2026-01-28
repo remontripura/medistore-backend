@@ -1,0 +1,11 @@
+model Medicine {
+    id         String     @unique @default(uuid())
+    images     String
+    name       String
+    price      String
+    discount   String
+    categoriId String
+    post       Categories @relation(fields: [categoriId], references: [id], onDelete: Cascade)
+    createdAt  DateTime   @default(now())
+    updatedAt  DateTime   @updatedAt
+}

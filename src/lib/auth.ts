@@ -23,7 +23,7 @@ export const auth = betterAuth({
     additionalFields: {
       role: {
         type: "string",
-        defaultValue: "USER",
+        defaultValue: "CUSTOMER",
         required: false,
       },
       phone: {
@@ -132,8 +132,6 @@ export const auth = betterAuth({
           text: `Verify your email using this link: ${verificationUrl}`,
           html,
         });
-
-        console.log("Verification email sent:", info.messageId);
       } catch (err) {
         throw err;
       }
@@ -141,8 +139,8 @@ export const auth = betterAuth({
   },
   socialProviders: {
     google: {
-      prompt : "select_account consent",
-      accessType : "offline",
+      prompt: "select_account consent",
+      accessType: "offline",
       clientId: config.google_client_id!,
       clientSecret: config.google_client_secret!,
     },
