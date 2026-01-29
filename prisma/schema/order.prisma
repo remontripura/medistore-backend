@@ -1,0 +1,14 @@
+model Order {
+    id        String      @unique @default(uuid())
+    userId    String
+    productId String
+    product   Medicine    @relation(fields: [productId], references: [id], onDelete: Cascade)
+    quantity  Int
+    status    OrderStatus @default(PENDING)
+}
+
+enum OrderStatus {
+    PENDING
+    APPROVED
+    REJECT
+}
