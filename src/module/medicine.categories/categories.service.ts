@@ -21,7 +21,7 @@ const getCategoriesBySeller = async (sellerId: string) => {
   });
 };
 const createCategories = async (
-  data: Omit<Categories, "id" | "createdAt" | "updatedAt" | "authorId">,
+  data: Omit<Categories, "id" | "createdAt" | "updatedAt" | "sellerId">,
   userId: string,
 ) => {
   const result = await prisma.categories.create({

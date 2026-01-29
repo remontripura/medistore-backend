@@ -3,8 +3,8 @@ model Categories {
     slug      String
     name      String
     medicines Medicine[]
-    sellerId  String
     createdAt DateTime   @default(now())
+    sellerId  String
     updatedAt DateTime   @updatedAt
 
     @@index([sellerId])
