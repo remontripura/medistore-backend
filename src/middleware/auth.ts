@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { auth as betterAuth } from "../lib/auth";
 export enum UserRole {
-  USER = "CUSTOMER",
+  CUSTOMER = "CUSTOMER",
   SELLER = "SELLER",
   ADMIN = "ADMIN",
 }

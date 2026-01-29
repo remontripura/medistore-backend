@@ -1,14 +1,37 @@
 model Order {
-    id        String      @unique @default(uuid())
-    userId    String
+    id          String      @id @default(uuid())
+    userId      String
+    address     String
+    status      OrderStatus @default(PENDING)
+    order_track OrderTrack  @default(ORDERD)
+    items       OrderItem[]
+    createdAt   DateTime    @default(now())
+    updatedAt   DateTime    @updatedAt
+    orderCode   String?      @unique
+    medicine    Medicine?   @relation(fields: [medicineId], references: [id])
+    medicineId  String?
+}
+
+model OrderItem {
+    id        String   @id @default(uuid())
     productId String
-    product   Medicine    @relation(fields: [productId], references: [id], onDelete: Cascade)
+    product   Medicine @relation(fields: [productId], references: [id])
     quantity  Int
-    status    OrderStatus @default(PENDING)
+
+    order   Order?  @relation(fields: [orderId], references: [id])
+    orderId String?
 }
 
 enum OrderStatus {
     PENDING
     APPROVED
     REJECT
+}
+
+enum OrderTrack {
+    ORDERD
+    ORDERD_READY
+    SHIPPED
+    OUT_OF_DELIVERY
+    DELIVERED
 }
