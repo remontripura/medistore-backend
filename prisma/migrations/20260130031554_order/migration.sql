@@ -93,24 +93,17 @@ CREATE TABLE "Medicine" (
 CREATE TABLE "Order" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
+    "orderCode" TEXT,
+    "sellerId" TEXT,
     "address" TEXT NOT NULL,
     "status" "OrderStatus" NOT NULL DEFAULT 'PENDING',
     "order_track" "OrderTrack" NOT NULL DEFAULT 'ORDERD',
+    "quantity" INTEGER NOT NULL,
+    "medicineId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "medicineId" TEXT,
 
     CONSTRAINT "Order_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "OrderItem" (
-    "id" TEXT NOT NULL,
-    "productId" TEXT NOT NULL,
-    "quantity" INTEGER NOT NULL,
-    "orderId" TEXT,
-
-    CONSTRAINT "OrderItem_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -137,6 +130,9 @@ CREATE INDEX "Categories_sellerId_idx" ON "Categories"("sellerId");
 -- CreateIndex
 CREATE UNIQUE INDEX "Medicine_id_key" ON "Medicine"("id");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "Order_orderCode_key" ON "Order"("orderCode");
+
 -- AddForeignKey
 ALTER TABLE "session" ADD CONSTRAINT "session_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -148,9 +144,3 @@ ALTER TABLE "Medicine" ADD CONSTRAINT "Medicine_categoriId_fkey" FOREIGN KEY ("c
 
 -- AddForeignKey
 ALTER TABLE "Order" ADD CONSTRAINT "Order_medicineId_fkey" FOREIGN KEY ("medicineId") REFERENCES "Medicine"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "OrderItem" ADD CONSTRAINT "OrderItem_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Medicine"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "OrderItem" ADD CONSTRAINT "OrderItem_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("id") ON DELETE SET NULL ON UPDATE CASCADE;

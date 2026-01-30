@@ -2,6 +2,21 @@ import { NextFunction, Request, Response } from "express";
 import { orderServices } from "./order.service";
 import { UserRole } from "../../middleware/auth";
 
+const getMyOrder = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const user = req.user;
+    if (!user) {
+      throw new Error("UnAthorised");
+    }
+    const isSeller = user.role === UserRole.SELLER;
+
+    const result = await orderServices.getMyOrder(user.id, isSeller);
+    res.status(200).json(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
 const createOrder = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const user = req.user;
@@ -11,7 +26,7 @@ const createOrder = async (req: Request, res: Response, next: NextFunction) => {
       });
     }
     const result = await orderServices.createOrder(req.body, user.id);
-    res.status(201).json(result);
+    res.status(201).json({ message: "Order Successfully", data: result });
   } catch (err) {
     next(err);
   }
@@ -30,7 +45,9 @@ const updateOrder = async (req: Request, res: Response, next: NextFunction) => {
       user.id,
       isSeller,
     );
-    res.status(201).json(result);
+    res
+      .status(201)
+      .json({ message: "Status update successfully", data: result });
   } catch (err) {
     next(err);
   }
@@ -39,4 +56,5 @@ const updateOrder = async (req: Request, res: Response, next: NextFunction) => {
 export const orderController = {
   createOrder,
   updateOrder,
+  getMyOrder,
 };

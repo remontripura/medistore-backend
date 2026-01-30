@@ -7,6 +7,7 @@ import errorHandler from "./middleware/globalErrorHandler";
 import { categoriesRoute } from "./module/medicine.categories/categories.routes";
 import { medicineRoute } from "./module/medicine/medicine.routes";
 import { orderRoute } from "./module/order/order.route";
+import { reviewRoute } from "./module/review/review.route";
 
 const app: Application = express();
 app.use(
@@ -21,6 +22,7 @@ app.all("/api/auth/*splat", toNodeHandler(auth));
 app.use("/categories", categoriesRoute);
 app.use("/medicine", medicineRoute);
 app.use("/order", orderRoute);
+app.use("/review", reviewRoute);
 app.use(errorHandler);
 
 export default app;

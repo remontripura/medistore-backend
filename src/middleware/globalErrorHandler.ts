@@ -5,8 +5,9 @@ function errorHandler(
   err: any,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
+  console.log(err);
   let statusCode = 500;
   let errorMessage = "Internal Server Error";
   let errorDetails = err;
@@ -26,7 +27,7 @@ function errorHandler(
       errorMessage = "Duplicate key error";
     } else if (err.code === "P2003") {
       statusCode = 400;
-      errorMessage: "Foreign key contraint faild";
+      errorMessage = "Foreign key constraint failed";
     }
   }
   //   PrismaClientKnownRequestError
@@ -44,10 +45,9 @@ function errorHandler(
       errorMessage = "Can't reach database server";
     }
   }
-  res.status(statusCode);
-  res.json({
+  res.status(statusCode).json({
     message: errorMessage,
-    error: errorDetails,
+    details: err instanceof Error ? err.message : err,
   });
 }
 export default errorHandler;

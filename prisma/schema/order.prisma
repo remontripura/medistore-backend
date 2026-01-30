@@ -1,25 +1,16 @@
 model Order {
     id          String      @id @default(uuid())
     userId      String
+    orderCode   String?     @unique
+    sellerId    String?
     address     String
     status      OrderStatus @default(PENDING)
     order_track OrderTrack  @default(ORDERD)
-    items       OrderItem[]
+    quantity    Int
+    medicineId  String?
+    medicine    Medicine?   @relation(fields: [medicineId], references: [id])
     createdAt   DateTime    @default(now())
     updatedAt   DateTime    @updatedAt
-    orderCode   String?      @unique
-    medicine    Medicine?   @relation(fields: [medicineId], references: [id])
-    medicineId  String?
-}
-
-model OrderItem {
-    id        String   @id @default(uuid())
-    productId String
-    product   Medicine @relation(fields: [productId], references: [id])
-    quantity  Int
-
-    order   Order?  @relation(fields: [orderId], references: [id])
-    orderId String?
 }
 
 enum OrderStatus {
