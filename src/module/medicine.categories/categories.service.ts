@@ -1,8 +1,46 @@
 import { Categories } from "../../../generated/prisma/client";
+import { CategoriesCreateManyInput } from "../../../generated/prisma/models";
 import { prisma } from "../../lib/prisma";
 
-const getAllCategories = async () => {
-  return await prisma.categories.findMany();
+
+const getAllCategories = async ({
+  page,
+  limit,
+  skip,
+  sortBy,
+  sortOrder,
+}: {
+  page: number;
+  limit: number;
+  skip: number;
+  sortBy: string;
+  sortOrder: string;
+}) => {
+  const andConditins: CategoriesCreateManyInput[] = [];
+  const allCategories = await prisma.categories.findMany({
+    take: limit,
+    skip,
+    where: {
+      AND: andConditins,
+    },
+    orderBy: {
+      [sortBy]: sortOrder,
+    },
+  });
+  const total = await prisma.review.count({
+    where: {
+      AND: andConditins,
+    },
+  });
+  return {
+    data: allCategories,
+    pagination: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
 };
 
 const getCategoriesById = async (categoryId: string) => {
@@ -21,13 +59,11 @@ const getCategoriesBySeller = async (sellerId: string) => {
   });
 };
 const createCategories = async (
-  data: Omit<Categories, "id" | "createdAt" | "updatedAt" | "sellerId">,
-  userId: string,
+  data: Omit<Categories, "createdAt" | "updatedAt">,
 ) => {
   const result = await prisma.categories.create({
     data: {
       ...data,
-      sellerId: userId,
     },
   });
   return result;
@@ -88,5 +124,4 @@ export const categoriesServices = {
   getAllCategories,
   getCategoriesBySeller,
   deleteCategories,
-  
 };

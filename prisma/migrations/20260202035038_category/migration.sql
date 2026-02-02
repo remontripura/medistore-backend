@@ -1,4 +1,10 @@
 -- CreateEnum
+CREATE TYPE "UserStatus" AS ENUM ('ACTIVE', 'DEACTIVE');
+
+-- CreateEnum
+CREATE TYPE "Role" AS ENUM ('CUSTOMER', 'SELLER', 'ADMIN');
+
+-- CreateEnum
 CREATE TYPE "OrderStatus" AS ENUM ('PENDING', 'APPROVED', 'REJECT');
 
 -- CreateEnum
@@ -9,13 +15,13 @@ CREATE TABLE "user" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
-    "emailVerified" BOOLEAN NOT NULL DEFAULT false,
+    "emailVerified" BOOLEAN NOT NULL DEFAULT true,
     "image" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "role" TEXT DEFAULT 'CUSTOMER',
+    "role" "Role" NOT NULL DEFAULT 'CUSTOMER',
     "phone" TEXT,
-    "status" TEXT DEFAULT 'ACTIVE',
+    "status" "UserStatus" NOT NULL DEFAULT 'ACTIVE',
 
     CONSTRAINT "user_pkey" PRIMARY KEY ("id")
 );
@@ -71,7 +77,6 @@ CREATE TABLE "Categories" (
     "slug" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "sellerId" TEXT NOT NULL,
     "updatedAt" TIMESTAMP(3) NOT NULL
 );
 
@@ -85,6 +90,18 @@ CREATE TABLE "Medicine" (
     "stock" INTEGER NOT NULL DEFAULT 0,
     "categoriId" TEXT NOT NULL,
     "sellerId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "Review" (
+    "id" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "descirption" TEXT NOT NULL,
+    "medicineId" TEXT NOT NULL,
+    "ratings" INTEGER NOT NULL,
+    "userId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL
 );
@@ -125,10 +142,13 @@ CREATE INDEX "verification_identifier_idx" ON "verification"("identifier");
 CREATE UNIQUE INDEX "Categories_id_key" ON "Categories"("id");
 
 -- CreateIndex
-CREATE INDEX "Categories_sellerId_idx" ON "Categories"("sellerId");
+CREATE INDEX "Categories_slug_idx" ON "Categories"("slug");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Medicine_id_key" ON "Medicine"("id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Review_id_key" ON "Review"("id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Order_orderCode_key" ON "Order"("orderCode");
@@ -141,6 +161,12 @@ ALTER TABLE "account" ADD CONSTRAINT "account_userId_fkey" FOREIGN KEY ("userId"
 
 -- AddForeignKey
 ALTER TABLE "Medicine" ADD CONSTRAINT "Medicine_categoriId_fkey" FOREIGN KEY ("categoriId") REFERENCES "Categories"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Review" ADD CONSTRAINT "Review_medicineId_fkey" FOREIGN KEY ("medicineId") REFERENCES "Medicine"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Review" ADD CONSTRAINT "Review_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Order" ADD CONSTRAINT "Order_medicineId_fkey" FOREIGN KEY ("medicineId") REFERENCES "Medicine"("id") ON DELETE SET NULL ON UPDATE CASCADE;

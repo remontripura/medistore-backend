@@ -8,10 +8,10 @@ router.get("/", categoriesController.getAllCategories);
 router.get("/:categoryId", categoriesController.getCategoriesById);
 router.get(
   "/seller/:sellerId",
-  auth(UserRole.SELLER),
+  auth(UserRole.ADMIN),
   categoriesController.getCategoriesBySeller,
 );
-router.post("/", auth(UserRole.SELLER), categoriesController.createCategories);
+router.post("/", auth(UserRole.ADMIN), categoriesController.createCategories);
 router.patch(
   "/:id",
   auth(UserRole.SELLER),

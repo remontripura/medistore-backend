@@ -14,7 +14,7 @@ declare global {
         email: string;
         name: string;
         role: string;
-        emailVerified: boolean;
+        // emailVerified: boolean;
       };
     }
   }
@@ -34,18 +34,18 @@ const auth = (...roles: UserRole[]) => {
           message: "you are not authrised",
         });
       }
-      if (!session.user.emailVerified) {
-        return res.status(403).json({
-          success: false,
-          message: "Email verification required. Please verify you email",
-        });
-      }
+      // if (!session.user.emailVerified) {
+      //   return res.status(403).json({
+      //     success: false,
+      //     message: "Email verification required. Please verify you email",
+      //   });
+      // }
       req.user = {
         id: session.user.id,
         email: session.user.email,
         name: session.user.name,
         role: session.user.role!,
-        emailVerified: session.user.emailVerified,
+        // emailVerified: session.user.emailVerified,
       };
       if (roles.length && !roles.includes(req.user.role as UserRole)) {
         return res.status(403).json({

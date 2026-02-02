@@ -18,26 +18,13 @@ async function seedAdmin() {
     if (existingUser) {
       throw new Error("User already exists in database");
     }
-    const signUpAdmin = await fetch(
-      `${config.better_auth_url}/api/auth/sign-up/email`,
-      {
-        method: "POST",
-        headers: {
-          "content-Type": "application/json",
-        },
-        body: JSON.stringify(adminData),
-      }
-    );
-    if (signUpAdmin.ok) {
-      await prisma.user.update({
-        where: {
-          email: adminData.email!,
-        },
-        data: {
-          emailVerified: true,
-        },
-      });
-    }
+    return await fetch(`${config.better_auth_url}/api/auth/sign-up/email`, {
+      method: "POST",
+      headers: {
+        "content-Type": "application/json",
+      },
+      body: JSON.stringify(adminData),
+    });
   } catch (error) {
     console.log("error message", error);
   }

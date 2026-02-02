@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
-import { categoriesServices } from "./categories.service";
+import paginationSortingHelper from "../../helpers/paginationSortingHelper";
 import { UserRole } from "../../middleware/auth";
+import { categoriesServices } from "./categories.service";
 
 const getAllCategories = async (
   req: Request,
@@ -8,14 +9,22 @@ const getAllCategories = async (
   next: NextFunction,
 ) => {
   try {
-    const result = await categoriesServices.getAllCategories();
-    res.status(200).json({
-      data: result,
+    const { page, limit, skip, sortBy, sortOrder } = paginationSortingHelper(
+      req.query,
+    );
+    const result = await categoriesServices.getAllCategories({
+      page,
+      limit,
+      skip,
+      sortBy,
+      sortOrder,
     });
-  } catch (err) {
+    res.status(200).json(result);
+  } catch (err: any) {
     next(err);
   }
 };
+
 const getCategoriesById = async (
   req: Request,
   res: Response,
@@ -60,12 +69,12 @@ const createCategories = async (
 ) => {
   try {
     const user = req.user;
-    if (!user) {
+    if (user?.role !== UserRole.ADMIN) {
       return res.status(400).json({
         error: "Unathorized",
       });
     }
-    const result = await categoriesServices.createCategories(req.body, user.id);
+    const result = await categoriesServices.createCategories(req.body);
     res.status(201).json(result);
   } catch (err) {
     next(err);

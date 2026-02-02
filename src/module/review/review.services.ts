@@ -1,37 +1,51 @@
 import { Review } from "../../../generated/prisma/client";
+import { ReviewWhereInput } from "../../../generated/prisma/models";
 import { prisma } from "../../lib/prisma";
 
-const getAllReview = async (authorId: string, isSeller: boolean) => {
-  await prisma.user.findUniqueOrThrow({
+const getAllReview = async ({
+  page,
+  limit,
+  skip,
+  sortBy,
+  sortOrder,
+  medicineId,
+}: {
+  page: number;
+  limit: number;
+  skip: number;
+  sortBy: string;
+  sortOrder: string;
+  medicineId: string | undefined;
+}) => {
+  const andConditins: ReviewWhereInput[] = [];
+  if (medicineId) {
+    andConditins.push({
+      medicineId,
+    });
+  }
+  const allPost = await prisma.review.findMany({
+    take: limit,
+    skip,
     where: {
-      id: authorId,
-      status: "ACTIVE",
+      AND: andConditins,
     },
-    select: {
-      id: true,
-      status: true,
-    },
-  });
-  const whereCondition = isSeller
-    ? { sellerId: authorId }
-    : { userId: authorId };
-  const result = await prisma.order.findMany({
-    where: whereCondition,
     orderBy: {
-      createdAt: "desc",
+      [sortBy]: sortOrder,
     },
   });
-  // const total = await prisma.post.aggregate({
-  //   _count: {
-  //     id: true,
-  //   },
-  //   where: {
-  //     authorId,
-  //   },
-  // });
+  const total = await prisma.review.count({
+    where: {
+      AND: andConditins,
+    },
+  });
   return {
-    message: "Order Retrive Successfully",
-    data: result,
+    data: allPost,
+    pagination: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    },
   };
 };
 
@@ -40,23 +54,29 @@ const createReview = async (
   userId: string,
   medicineId: string,
 ) => {
-  const checkOrder = await prisma.order.findMany({
+  const order = await prisma.order.findFirst({
     where: {
-      userId: userId,
+      userId,
+      medicineId,
     },
   });
-
-  const findOrderData = checkOrder.find(
-    (item) => item.medicineId === medicineId,
-  );
-  if (findOrderData?.medicineId !== medicineId) {
+  if (!order) {
     throw new Error("You aren't allow for review this product.");
+  }
+  const existReview = await prisma.review.findFirst({
+    where: {
+      userId,
+      medicineId,
+    },
+  });
+  if (existReview) {
+    throw new Error("You already reviewed this product.");
   }
   const result = await prisma.review.create({
     data: {
       ...data,
-      medicineId: medicineId,
-      userId: userId,
+      medicineId,
+      userId,
     },
     select: {
       id: true,
@@ -67,6 +87,7 @@ const createReview = async (
       updatedAt: true,
     },
   });
+
   return {
     message: "Review Successfully",
     data: result,

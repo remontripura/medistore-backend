@@ -48,7 +48,6 @@ const createMedicine = async (
   res: Response,
   next: NextFunction,
 ) => {
-  console.log("first");
   try {
     const user = req.user;
     if (!user) {

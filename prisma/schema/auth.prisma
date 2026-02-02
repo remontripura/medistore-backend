@@ -2,16 +2,16 @@ model User {
     id            String    @id
     name          String
     email         String
-    emailVerified Boolean   @default(false)
+    emailVerified Boolean   @default(true)
     image         String?
     createdAt     DateTime  @default(now())
     updatedAt     DateTime  @updatedAt
     sessions      Session[]
     accounts      Account[]
 
-    role    String?  @default("CUSTOMER")
+    role    Role  @default(CUSTOMER)
     phone   String?
-    status  String?  @default("ACTIVE")
+    status  UserStatus  @default(ACTIVE)
     reviews Review[]
 
     @@unique([email])
@@ -64,4 +64,14 @@ model Verification {
 
     @@index([identifier])
     @@map("verification")
+}
+
+enum UserStatus {
+    ACTIVE
+    DEACTIVE
+}
+enum Role {
+    CUSTOMER
+    SELLER
+    ADMIN
 }

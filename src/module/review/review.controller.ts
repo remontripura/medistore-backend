@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { UserRole } from "../../middleware/auth";
 import { reviewServices } from "./review.services";
+import paginationSortingHelper from "../../helpers/paginationSortingHelper";
 
 const getAllReview = async (
   req: Request,
@@ -8,15 +8,20 @@ const getAllReview = async (
   next: NextFunction,
 ) => {
   try {
-    const user = req.user;
-    if (!user) {
-      throw new Error("UnAthorised");
-    }
-    const isSeller = user.role === UserRole.SELLER;
-
-    const result = await reviewServices.getAllReview(user.id, isSeller);
+        const medicineId = req.query.medicineId as string | undefined;
+    const { page, limit, skip, sortBy, sortOrder } = paginationSortingHelper(
+      req.query,
+    );
+    const result = await reviewServices.getAllReview({
+      page,
+      limit,
+      skip,
+      sortBy,
+      sortOrder,
+      medicineId,
+    });
     res.status(200).json(result);
-  } catch (err) {
+  } catch (err: any) {
     next(err);
   }
 };
