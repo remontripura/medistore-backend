@@ -5,8 +5,8 @@ model Medicine {
     price      String
     discount   String
     stock      Int        @default(0)
-    categoriId String
-    category   Categories @relation(fields: [categoriId], references: [id], onDelete: Cascade)
+    categoryId String
+    category   Categories @relation(fields: [categoryId], references: [id], onDelete: Cascade)
     sellerId   String
     createdAt  DateTime   @default(now())
     updatedAt  DateTime   @updatedAt

@@ -30,8 +30,7 @@ const getAllMedicine = async ({
       ],
     });
   }
-
-  const allPost = await prisma.medicine.findMany({
+  const allMedicine = await prisma.medicine.findMany({
     take: limit,
     skip,
     where: {
@@ -40,14 +39,65 @@ const getAllMedicine = async ({
     orderBy: {
       [sortBy]: sortOrder,
     },
+    select: {
+      id: true,
+      images: true,
+      name: true,
+      price: true,
+      discount: true,
+      stock: true,
+      category: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+        },
+      },
+      reviews: {
+        select: {
+          ratings: true,
+        },
+      },
+      _count: {
+        select: {
+          reviews: true,
+        },
+      },
+
+      createdAt: true,
+      updatedAt: true,
+    },
   });
+
   const total = await prisma.medicine.count({
     where: {
       AND: andConditins,
     },
   });
+  const allMedicineData = allMedicine.map((medicine) => {
+    const total_reviews = medicine.reviews.length;
+    const avg_ratings =
+      total_reviews === 0
+        ? 0
+        : medicine.reviews.reduce((sum, r) => sum + r.ratings, 0) /
+          total_reviews;
+
+    return {
+      id: medicine.id,
+      images: medicine.images,
+      name: medicine.name,
+      price: medicine.price,
+      discount: medicine.discount,
+      stock: medicine.stock,
+      category: medicine.category,
+      avg_ratings: Number(avg_ratings.toFixed(1)),
+      total_reviews,
+      createdAt: medicine.createdAt,
+      updatedAt: medicine.updatedAt,
+    };
+  });
   return {
-    data: allPost,
+    data: allMedicineData,
     pagination: {
       total,
       page,
@@ -56,21 +106,55 @@ const getAllMedicine = async ({
     },
   };
 };
+
 const getMedicineById = async (medicineId: string) => {
-  return await prisma.medicine.findUnique({
-    where: {
-      id: medicineId,
+  const medicineData = await prisma.medicine.findUnique({
+    where: { id: medicineId },
+    select: {
+      id: true,
+      images: true,
+      name: true,
+      price: true,
+      discount: true,
+      stock: true,
+      createdAt: true,
+      updatedAt: true,
     },
   });
+
+  if (!medicineData) return null;
+
+  const reviewStats = await prisma.review.aggregate({
+    where: { medicineId },
+    _count: { id: true },
+    _avg: { ratings: true },
+  });
+
+  return {
+    id: medicineData?.id,
+    images: medicineData?.images,
+    name: medicineData?.name,
+    price: medicineData?.price,
+    discount: medicineData?.discount,
+    stock: medicineData?.stock,
+    avg_review: Number(reviewStats._avg.ratings ?? 0),
+    total_review: reviewStats._count.id ?? 0,
+    createdAt: medicineData?.createdAt,
+    updatedAt: medicineData?.updatedAt,
+  };
 };
 
 const createMedicine = async (
   data: Omit<Medicine, "id" | "createdAt" | "updatedAt">,
   sellerId: string,
 ) => {
+  const { categoryId, ...rest } = data;
   const result = await prisma.medicine.create({
     data: {
-      ...data,
+      ...rest,
+      category: {
+        connect: { id: categoryId },
+      },
       sellerId: sellerId,
     },
   });
