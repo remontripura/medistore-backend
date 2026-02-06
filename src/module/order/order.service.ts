@@ -1,8 +1,15 @@
 import { Order, OrderStatus } from "../../../generated/prisma/client";
+import { OrderWhereInput } from "../../../generated/prisma/models";
 import { generateOrderCode } from "../../helpers/generateRendomOrderCode";
 import { prisma } from "../../lib/prisma";
 
-const getMyOrder = async (authorId: string, isSeller: boolean) => {
+const getMyOrder = async (
+  authorId: string,
+  isSeller: boolean,
+  page: number,
+  limit: number,
+) => {
+  const andConditins: OrderWhereInput[] = [];
   await prisma.user.findUniqueOrThrow({
     where: {
       id: authorId,
@@ -13,6 +20,12 @@ const getMyOrder = async (authorId: string, isSeller: boolean) => {
       status: true,
     },
   });
+  const total = await prisma.order.count({
+    where: {
+      AND: andConditins,
+    },
+  });
+
   const whereCondition = isSeller
     ? { sellerId: authorId }
     : { userId: authorId };
@@ -21,18 +34,34 @@ const getMyOrder = async (authorId: string, isSeller: boolean) => {
     orderBy: {
       createdAt: "desc",
     },
+    select: {
+      id: true,
+      userId: true,
+      address: true,
+      status: true,
+      order_track: true,
+      quantity: true,
+      medicine: {
+        select: {
+          id: true,
+          name: true,
+          images: true,
+        },
+      },
+      createdAt: true,
+      updatedAt: true,
+    },
   });
-  // const total = await prisma.post.aggregate({
-  //   _count: {
-  //     id: true,
-  //   },
-  //   where: {
-  //     authorId,
-  //   },
-  // });
+
   return {
     message: "Order Retrive Successfully",
     data: result,
+    pagination: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    },
   };
 };
 

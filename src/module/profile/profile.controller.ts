@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from "express";
-import { profileServices } from "./profile.service";
-import { UserRole } from "../../middleware/auth";
+import { uploadToImgbb } from "../../helpers/imgbbUploadHelper";
 import paginationSortingHelper from "../../helpers/paginationSortingHelper";
+import { UserRole } from "../../middleware/auth";
+import { profileServices } from "./profile.service";
 
 const getUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -45,14 +46,23 @@ const updateProfile = async (
   try {
     const user = req.user;
     if (!user) {
-      throw new Error("UnAthorised");
+      throw new Error("Unauthorised");
     }
-    const result = await profileServices.updateProfile(req.body, user.id);
+    let imageUrl: string | undefined;
+    if (req.file) {
+      imageUrl = await uploadToImgbb(req.file.buffer);
+    }
+    const payload = {
+      ...req.body,
+      ...(imageUrl && { image: imageUrl }),
+    };
+    const result = await profileServices.updateProfile(payload, user.id);
     res.status(200).json(result);
   } catch (err) {
     next(err);
   }
 };
+
 const updateUserStatus = async (
   req: Request,
   res: Response,

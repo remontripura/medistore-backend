@@ -1,6 +1,7 @@
 import { toNodeHandler } from "better-auth/node";
 import cors from "cors";
 import express, { Application } from "express";
+import multer from "multer";
 import config from "./config";
 import { auth } from "./lib/auth";
 import errorHandler from "./middleware/globalErrorHandler";
@@ -9,6 +10,9 @@ import { medicineRoute } from "./module/medicine/medicine.routes";
 import { orderRoute } from "./module/order/order.route";
 import { profileRoute } from "./module/profile/profile.route";
 import { reviewRoute } from "./module/review/review.route";
+
+const storage = multer.memoryStorage();
+export const upload = multer({ storage });
 
 const app: Application = express();
 app.use(
@@ -24,7 +28,7 @@ app.use("/categories", categoriesRoute);
 app.use("/medicine", medicineRoute);
 app.use("/order", orderRoute);
 app.use("/review", reviewRoute);
-app.use("/user", profileRoute);
+app.use("/user", upload.single("image"), profileRoute);
 app.use(errorHandler);
 
 export default app;

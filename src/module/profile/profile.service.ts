@@ -5,6 +5,10 @@ type updateData = {
   image?: string;
   phone?: string;
 };
+type updatePass = {
+  old_password?: string;
+  new_password?: string;
+};
 
 const getUser = async ({
   page,
@@ -113,7 +117,6 @@ const updateProfile = async (data: updateData, authorId: string) => {
   if (data.name) updateData.name = data.name;
   if (data.image) updateData.image = data.image;
   if (data.phone) updateData.phone = data.phone;
-
   const updatedUser = await prisma.user.update({
     where: { id: authorId },
     data: updateData,

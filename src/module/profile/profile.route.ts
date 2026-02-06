@@ -14,6 +14,7 @@ router.patch(
   auth(UserRole.CUSTOMER, UserRole.SELLER),
   profileController.updateProfile,
 );
+
 router.patch(
   "/admin/:userId",
   auth(UserRole.ADMIN),

@@ -3,9 +3,9 @@ import { Prisma } from "../../generated/prisma/client";
 
 function errorHandler(
   err: any,
-  req: Request,
+  _req: Request,
   res: Response,
-  next: NextFunction,
+  _next: NextFunction,
 ) {
   console.log(err);
   let statusCode = 500;

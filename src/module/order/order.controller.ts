@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { orderServices } from "./order.service";
 import { UserRole } from "../../middleware/auth";
+import paginationSortingHelper from "../../helpers/paginationSortingHelper";
 
 const getMyOrder = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -8,9 +9,15 @@ const getMyOrder = async (req: Request, res: Response, next: NextFunction) => {
     if (!user) {
       throw new Error("UnAthorised");
     }
+    console.log("sellerid and role", user.role, user.id);
     const isSeller = user.role === UserRole.SELLER;
-
-    const result = await orderServices.getMyOrder(user.id, isSeller);
+    const { page, limit } = paginationSortingHelper(req.query);
+    const result = await orderServices.getMyOrder(
+      user.id,
+      isSeller,
+      page,
+      limit,
+    );
     res.status(200).json(result);
   } catch (err) {
     next(err);
