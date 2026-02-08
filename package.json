@@ -6,7 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "npx tsx watch src/server.ts",
-    "seed:admin": "npx tsx src/scripts/seedAdmin.ts"
+    "seed:admin": "npx tsx src/scripts/seedAdmin.ts",
+    "build": "prisma generate && tsup",
+    "postinstall": "prisma generate"
   },
   "keywords": [],
   "author": "",
@@ -33,6 +35,7 @@
     "express": "^5.2.1",
     "multer": "^2.0.2",
     "nodemailer": "^7.0.12",
-    "pg": "^8.16.3"
+    "pg": "^8.16.3",
+    "tsup": "^8.5.1"
   }
 }

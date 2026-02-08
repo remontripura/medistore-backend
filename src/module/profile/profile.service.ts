@@ -112,31 +112,31 @@ const updateUserStatus = async (
   return updatedUser;
 };
 
-const updateProfile = async (data: updateData, authorId: string) => {
-  const updateData: updateData = {};
-  if (data.name) updateData.name = data.name;
-  if (data.image) updateData.image = data.image;
-  if (data.phone) updateData.phone = data.phone;
-  const updatedUser = await prisma.user.update({
-    where: { id: authorId },
-    data: updateData,
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      image: true,
-      phone: true,
-      role: true,
-      status: true,
-      createdAt: true,
-      updatedAt: true,
-    },
-  });
-  return updatedUser;
-};
+// const updateProfile = async (data: updateData, authorId: string) => {
+//   const updateData: updateData = {};
+//   if (data.name) updateData.name = data.name;
+//   if (data.image) updateData.image = data.image;
+//   if (data.phone) updateData.phone = data.phone;
+//   const updatedUser = await prisma.user.update({
+//     where: { id: authorId },
+//     data: updateData,
+//     select: {
+//       id: true,
+//       name: true,
+//       email: true,
+//       image: true,
+//       phone: true,
+//       role: true,
+//       status: true,
+//       createdAt: true,
+//       updatedAt: true,
+//     },
+//   });
+//   return updatedUser;
+// };
 
 export const profileServices = {
-  updateProfile,
+  // updateProfile,
   userProfile,
   getUser,
   updateUserStatus,

@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { medicineServices } from "./medicine.service";
 import paginationSortingHelper from "../../helpers/paginationSortingHelper";
 import { UserRole } from "../../middleware/auth";
+import { uploadToImgbb } from "../../helpers/imgbbUploadHelper";
 
 const getAllMedicine = async (req: Request, res: Response) => {
   try {
@@ -55,8 +56,15 @@ const createMedicine = async (
         error: "Unathorized",
       });
     }
-
-    const result = await medicineServices.createMedicine(req.body, user.id);
+    let imageUrl: string | undefined;
+    if (req.file) {
+      imageUrl = await uploadToImgbb(req.file.buffer);
+    }
+    const payload = {
+      ...req.body,
+      ...(imageUrl && { images: imageUrl }),
+    };
+    const result = await medicineServices.createMedicine(payload, user.id);
     res.status(201).json(result);
   } catch (err) {
     next(err);

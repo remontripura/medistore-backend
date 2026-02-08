@@ -75,12 +75,12 @@ const getAllMedicine = async ({
     },
   });
   const allMedicineData = allMedicine.map((medicine) => {
-    const total_reviews = medicine.reviews.length;
+    const total_review = medicine.reviews.length;
     const avg_ratings =
-      total_reviews === 0
+      total_review === 0
         ? 0
         : medicine.reviews.reduce((sum, r) => sum + r.ratings, 0) /
-          total_reviews;
+          total_review;
 
     return {
       id: medicine.id,
@@ -90,8 +90,8 @@ const getAllMedicine = async ({
       discount: medicine.discount,
       stock: medicine.stock,
       category: medicine.category,
-      avg_ratings: Number(avg_ratings.toFixed(1)),
-      total_reviews,
+      avg_review: Number(avg_ratings.toFixed(1)),
+      total_review,
       createdAt: medicine.createdAt,
       updatedAt: medicine.updatedAt,
     };
@@ -149,13 +149,18 @@ const createMedicine = async (
   sellerId: string,
 ) => {
   const { categoryId, ...rest } = data;
+
+  const payload = {
+    ...rest,
+    stock: Number(data.stock),
+  };
   const result = await prisma.medicine.create({
     data: {
-      ...rest,
+      ...payload,
       category: {
         connect: { id: categoryId },
       },
-      sellerId: sellerId,
+      sellerId,
     },
   });
   return result;

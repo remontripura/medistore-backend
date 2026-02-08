@@ -38,30 +38,30 @@ const userProfile = async (req: Request, res: Response, next: NextFunction) => {
     next(err);
   }
 };
-const updateProfile = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const user = req.user;
-    if (!user) {
-      throw new Error("Unauthorised");
-    }
-    let imageUrl: string | undefined;
-    if (req.file) {
-      imageUrl = await uploadToImgbb(req.file.buffer);
-    }
-    const payload = {
-      ...req.body,
-      ...(imageUrl && { image: imageUrl }),
-    };
-    const result = await profileServices.updateProfile(payload, user.id);
-    res.status(200).json(result);
-  } catch (err) {
-    next(err);
-  }
-};
+// const updateProfile = async (
+//   req: Request,
+//   res: Response,
+//   next: NextFunction,
+// ) => {
+//   try {
+//     const user = req.user;
+//     if (!user) {
+//       throw new Error("Unauthorised");
+//     }
+//     let imageUrl: string | undefined;
+//     if (req.file) {
+//       imageUrl = await uploadToImgbb(req.file.buffer);
+//     }
+//     const payload = {
+//       ...req.body,
+//       ...(imageUrl && { image: imageUrl }),
+//     };
+//     const result = await profileServices.updateProfile(payload, user.id);
+//     res.status(200).json(result);
+//   } catch (err) {
+//     next(err);
+//   }
+// };
 
 const updateUserStatus = async (
   req: Request,
@@ -82,7 +82,7 @@ const updateUserStatus = async (
 };
 
 export const profileController = {
-  updateProfile,
+  // updateProfile,
   userProfile,
   getUser,
   updateUserStatus,

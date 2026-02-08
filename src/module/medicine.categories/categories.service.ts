@@ -2,7 +2,6 @@ import { Categories } from "../../../generated/prisma/client";
 import { CategoriesCreateManyInput } from "../../../generated/prisma/models";
 import { prisma } from "../../lib/prisma";
 
-
 const getAllCategories = async ({
   page,
   limit,
@@ -51,12 +50,8 @@ const getCategoriesById = async (categoryId: string) => {
   });
 };
 
-const getCategoriesBySeller = async (sellerId: string) => {
-  return await prisma.categories.findMany({
-    where: {
-      sellerId: sellerId,
-    },
-  });
+const getCategoriesBySeller = async () => {
+  return await prisma.categories.findMany();
 };
 const createCategories = async (
   data: Omit<Categories, "createdAt" | "updatedAt">,
@@ -72,8 +67,6 @@ const createCategories = async (
 const updateCategories = async (
   categoriesId: string,
   data: Partial<Categories>,
-  authorId: string,
-  isAdmin: boolean,
 ) => {
   const postData = await prisma.categories.findUniqueOrThrow({
     where: {
@@ -81,12 +74,9 @@ const updateCategories = async (
     },
     select: {
       id: true,
-      sellerId: true,
     },
   });
-  if (!isAdmin && postData.sellerId !== authorId) {
-    throw new Error("You are not the owner of the post");
-  }
+
   return await prisma.categories.update({
     where: {
       id: postData.id,
@@ -94,23 +84,7 @@ const updateCategories = async (
     data,
   });
 };
-const deleteCategories = async (
-  categoryId: string,
-  authorId: string,
-  isAdmin: boolean,
-) => {
-  const categoryItem = await prisma.categories.findUniqueOrThrow({
-    where: {
-      id: categoryId,
-    },
-    select: {
-      id: true,
-      sellerId: true,
-    },
-  });
-  if (!isAdmin && categoryItem.sellerId !== authorId) {
-    throw new Error("You are not the owner of the post");
-  }
+const deleteCategories = async (categoryId: string) => {
   return await prisma.categories.delete({
     where: {
       id: categoryId,

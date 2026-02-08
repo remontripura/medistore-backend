@@ -46,14 +46,13 @@ const getCategoriesBySeller = async (
   next: NextFunction,
 ) => {
   try {
-    const { sellerId } = req.params;
     const user = req.user;
-    if (!user) {
+    if (user?.role !== UserRole.ADMIN) {
       return res.status(400).json({
         error: "Unathorized",
       });
     }
-    const result = await categoriesServices.getCategoriesBySeller(sellerId!);
+    const result = await categoriesServices.getCategoriesBySeller();
     res.status(200).json({
       data: result,
     });
@@ -87,17 +86,11 @@ const updateCategories = async (
 ) => {
   try {
     const user = req.user;
-    if (!user) {
+    if (user?.role === UserRole.ADMIN) {
       throw new Error("UnAthorised");
     }
     const { id } = req.params;
-    const isAdmin = user.role === UserRole.ADMIN;
-    const result = await categoriesServices.updateCategories(
-      id!,
-      req.body,
-      user.id,
-      isAdmin,
-    );
+    const result = await categoriesServices.updateCategories(id!, req.body);
     res.status(201).json(result);
   } catch (err) {
     next(err);
@@ -111,16 +104,11 @@ const deleteCategories = async (
 ) => {
   try {
     const user = req.user;
-    if (!user) {
+    if (user?.role === UserRole.ADMIN) {
       throw new Error("UnAthorized");
     }
     const { categoryId } = req.params;
-    const isAdmin = user.role === UserRole.ADMIN;
-    const result = await categoriesServices.deleteCategories(
-      categoryId!,
-      user.id,
-      isAdmin,
-    );
+    const result = await categoriesServices.deleteCategories(categoryId!);
     res.status(200).json(result);
   } catch (err) {
     next(err);
