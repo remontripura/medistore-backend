@@ -7,7 +7,6 @@ function errorHandler(
   res: Response,
   _next: NextFunction,
 ) {
-  console.log(err);
   let statusCode = 500;
   let errorMessage = "Internal Server Error";
   let errorDetails = err;
@@ -46,6 +45,7 @@ function errorHandler(
     }
   }
   res.status(statusCode).json({
+    success: false,
     message: errorMessage,
     details: err instanceof Error ? err.message : err,
   });

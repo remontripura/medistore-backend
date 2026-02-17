@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { reviewServices } from "./review.services";
 import paginationSortingHelper from "../../helpers/paginationSortingHelper";
+import { reviewServices } from "./review.services";
 
 const getAllReview = async (
   req: Request,
@@ -8,7 +8,7 @@ const getAllReview = async (
   next: NextFunction,
 ) => {
   try {
-        const medicineId = req.query.medicineId as string | undefined;
+    const medicineId = req.query.medicineId as string | undefined;
     const { page, limit, skip, sortBy, sortOrder } = paginationSortingHelper(
       req.query,
     );

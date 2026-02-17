@@ -23,7 +23,7 @@ const getAllReview = async ({
       medicineId,
     });
   }
-  const allPost = await prisma.review.findMany({
+  const reviews = await prisma.review.findMany({
     take: limit,
     skip,
     where: {
@@ -32,6 +32,17 @@ const getAllReview = async ({
     orderBy: {
       [sortBy]: sortOrder,
     },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+          image: true,
+        },
+      },
+    },
   });
   const total = await prisma.review.count({
     where: {
@@ -39,7 +50,7 @@ const getAllReview = async ({
     },
   });
   return {
-    data: allPost,
+    data: reviews,
     pagination: {
       total,
       page,
@@ -81,7 +92,7 @@ const createReview = async (
     select: {
       id: true,
       title: true,
-      descirption: true,
+      description: true,
       ratings: true,
       createdAt: true,
       updatedAt: true,

@@ -17,7 +17,7 @@ model Medicine {
 model Review {
     id          String   @unique @default(uuid())
     title       String
-    descirption String
+    description String
     medicineId  String
     ratings     Int
     userId      String
